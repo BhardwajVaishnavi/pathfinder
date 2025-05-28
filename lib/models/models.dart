@@ -1,4 +1,11 @@
 export 'user.dart';
+export 'user_types.dart';
+export 'student.dart';
+export 'parent.dart';
+export 'teacher.dart';
+export 'counselor.dart';
+export 'counseling_session.dart';
+export 'ai_report.dart';
 export 'category.dart';
 export 'test_set.dart';
 export 'question.dart';

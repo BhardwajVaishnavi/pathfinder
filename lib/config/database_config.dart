@@ -6,8 +6,7 @@ class DatabaseConfig {
   static const String username = 'neondb_owner';
   static const String password = 'npg_hPHsRAyS2XV5';
   static const bool useSSL = true;
-  
-  // Connection string
-  static String get connectionString => 
-      'postgresql://$username:$password@$host/$database?sslmode=${useSSL ? 'require' : 'disable'}';
+
+  // Full connection string from NeonDB
+  static const String connectionString = 'postgresql://neondb_owner:npg_hPHsRAyS2XV5@ep-soft-sky-a4h1bku6-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require';
 }

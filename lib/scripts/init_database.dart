@@ -1,10 +1,10 @@
 import 'package:postgres/postgres.dart';
 import '../config/database_config.dart';
 
-/// This script initializes the database tables for the application.
-/// Run this script once to set up the database schema.
+/// This script initializes the comprehensive database schema for PathfinderAI.
+/// Run this script once to set up all database tables.
 Future<void> main() async {
-  print('Initializing database...');
+  print('Initializing PathfinderAI database schema...');
 
   final connection = PostgreSQLConnection(
     DatabaseConfig.host,

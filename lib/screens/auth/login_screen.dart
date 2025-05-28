@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../services/services.dart';
 import '../../utils/utils.dart';
 import '../../widgets/widgets.dart';
-import 'register_screen.dart';
+import 'role_selection_screen.dart';
 import '../home_screen.dart';
 import '../profile_completion_screen.dart';
 
@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _navigateToRegister() {
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const RegisterScreen()),
+      MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
     );
   }
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../utils/utils.dart';
 import '../widgets/widgets.dart';
 import 'auth/login_screen.dart';
-import 'auth/register_screen.dart';
+import 'auth/role_selection_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({Key? key}) : super(key: key);
@@ -68,7 +68,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (!mounted) return;
 
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const RegisterScreen()),
+      MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
     );
   }
 

@@ -42,16 +42,17 @@ class RoleSelectionScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppDimensions.paddingL),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Add some top spacing for better mobile layout
+              const SizedBox(height: AppDimensions.paddingXL),
               // App logo
               const Icon(
                 Icons.psychology,
-                size: 100,
+                size: 80,
                 color: AppColors.primary,
               ),
               const SizedBox(height: AppDimensions.paddingM),
@@ -59,7 +60,7 @@ class RoleSelectionScreen extends StatelessWidget {
               // App name
               Text(
                 AppStrings.appName,
-                style: AppTextStyles.headline1,
+                style: AppTextStyles.headline2,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppDimensions.paddingS),
@@ -72,7 +73,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: AppDimensions.paddingXL * 2),
+              const SizedBox(height: AppDimensions.paddingXL),
 
               // Role selection title
               Text(
@@ -80,7 +81,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 style: AppTextStyles.headline3,
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: AppDimensions.paddingXL),
+              const SizedBox(height: AppDimensions.paddingL),
 
               // Student role card
               _RoleCard(
@@ -89,7 +90,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 description: 'Take psychometric tests and get AI-powered career guidance',
                 onTap: () => _navigateToRegistration(context, UserRole.student),
               ),
-              const SizedBox(height: AppDimensions.paddingL),
+              const SizedBox(height: AppDimensions.paddingM),
 
               // Parent role card
               _RoleCard(
@@ -98,7 +99,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 description: 'Monitor your child\'s progress and access detailed reports',
                 onTap: () => _navigateToRegistration(context, UserRole.parent),
               ),
-              const SizedBox(height: AppDimensions.paddingL),
+              const SizedBox(height: AppDimensions.paddingM),
 
               // Teacher role card
               _RoleCard(
@@ -107,7 +108,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 description: 'Access student analytics and manage class performance',
                 onTap: () => _navigateToRegistration(context, UserRole.teacher),
               ),
-              const SizedBox(height: AppDimensions.paddingXL * 2),
+              const SizedBox(height: AppDimensions.paddingXL),
 
               // Login link
               Row(
@@ -123,6 +124,9 @@ class RoleSelectionScreen extends StatelessWidget {
                   ),
                 ],
               ),
+
+              // Add bottom spacing for mobile screens
+              const SizedBox(height: AppDimensions.paddingXL),
             ],
           ),
         ),
@@ -155,15 +159,15 @@ class _RoleCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         child: Padding(
-          padding: const EdgeInsets.all(AppDimensions.paddingL),
+          padding: const EdgeInsets.all(AppDimensions.paddingM),
           child: Column(
             children: [
               Icon(
                 icon,
-                size: 48,
+                size: 40,
                 color: AppColors.primary,
               ),
-              const SizedBox(height: AppDimensions.paddingM),
+              const SizedBox(height: AppDimensions.paddingS),
               Text(
                 title,
                 style: AppTextStyles.headline3,
@@ -176,6 +180,8 @@ class _RoleCard extends StatelessWidget {
                   color: AppColors.textSecondary,
                 ),
                 textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

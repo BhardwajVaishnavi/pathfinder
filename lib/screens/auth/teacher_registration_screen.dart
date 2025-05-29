@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/models.dart';
+import '../../models/teacher_user.dart';
+import '../../services/multi_user_auth_service.dart';
 import '../../utils/utils.dart';
 import '../../widgets/widgets.dart';
 import 'login_screen.dart';
@@ -150,15 +152,35 @@ class _TeacherRegistrationScreenState extends State<TeacherRegistrationScreen> {
     });
 
     try {
-      // Here you would integrate with your enhanced auth service
-      // For now, we'll show a success message
+      final authService = MultiUserAuthService();
+
+      // Register teacher with all collected data
+      final teacherUser = await authService.registerTeacher(
+        fullName: _fullNameController.text.trim(),
+        employeeId: _employeeIdController.text.trim(),
+        institutionName: _institutionNameController.text.trim(),
+        designation: _designationController.text.trim(),
+        subjectExpertise: _selectedSubjects,
+        email: _emailController.text.trim(),
+        phone: _phoneController.text.trim(),
+        yearsOfExperience: int.parse(_yearsOfExperienceController.text.trim()),
+        institutionAddress: _institutionAddressController.text.trim(),
+        state: _stateController.text.trim(),
+        district: _districtController.text.trim(),
+        city: _cityController.text.trim(),
+        pincode: _pincodeController.text.trim(),
+        accessLevel: _selectedAccessLevel,
+        preferredLanguage: _selectedLanguage,
+        password: _passwordController.text.trim(),
+      );
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Teacher registration successful! Please wait for verification.'),
+          content: Text('Teacher registration successful! Data saved to database.'),
           backgroundColor: AppColors.success,
+          duration: Duration(seconds: 3),
         ),
       );
 

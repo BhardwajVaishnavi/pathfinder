@@ -1,49 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'user_types.dart';
 
-enum AdminAccessLevel {
-  basic,
-  moderate,
-  full,
-}
-
-extension AdminAccessLevelExtension on AdminAccessLevel {
-  String get value {
-    switch (this) {
-      case AdminAccessLevel.basic:
-        return 'basic';
-      case AdminAccessLevel.moderate:
-        return 'moderate';
-      case AdminAccessLevel.full:
-        return 'full';
-    }
-  }
-
-  String get displayName {
-    switch (this) {
-      case AdminAccessLevel.basic:
-        return 'Basic Access';
-      case AdminAccessLevel.moderate:
-        return 'Moderate Access';
-      case AdminAccessLevel.full:
-        return 'Full Access';
-    }
-  }
-
-  static AdminAccessLevel fromString(String value) {
-    switch (value.toLowerCase()) {
-      case 'basic':
-        return AdminAccessLevel.basic;
-      case 'moderate':
-        return AdminAccessLevel.moderate;
-      case 'full':
-        return AdminAccessLevel.full;
-      default:
-        return AdminAccessLevel.basic;
-    }
-  }
-}
-
 class Teacher extends Equatable {
   final int id;
   final String fullName;

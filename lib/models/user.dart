@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'user_types.dart';
 
 enum Gender {
   male,
@@ -40,11 +41,18 @@ class User extends Equatable {
   final String? address;
   final String? city;
   final String? state;
+  final String? district;
   final String? country;
   final String? pincode;
   final String? identityProofType; // Aadhaar, PAN, Passport, etc.
   final String? identityProofNumber;
   final String? identityProofImagePath;
+  final EducationCategory? educationCategory;
+  final String? institutionName;
+  final String? academicYear;
+  final String? parentContact;
+  final Language? preferredLanguage;
+  final String? passwordHash;
   final bool isProfileComplete;
   final DateTime? createdAt;
 
@@ -58,11 +66,18 @@ class User extends Equatable {
     this.address,
     this.city,
     this.state,
+    this.district,
     this.country,
     this.pincode,
     this.identityProofType,
     this.identityProofNumber,
     this.identityProofImagePath,
+    this.educationCategory,
+    this.institutionName,
+    this.academicYear,
+    this.parentContact,
+    this.preferredLanguage,
+    this.passwordHash,
     this.isProfileComplete = false,
     this.createdAt,
   });
@@ -77,11 +92,18 @@ class User extends Equatable {
     String? address,
     String? city,
     String? state,
+    String? district,
     String? country,
     String? pincode,
     String? identityProofType,
     String? identityProofNumber,
     String? identityProofImagePath,
+    EducationCategory? educationCategory,
+    String? institutionName,
+    String? academicYear,
+    String? parentContact,
+    Language? preferredLanguage,
+    String? passwordHash,
     bool? isProfileComplete,
     DateTime? createdAt,
   }) {
@@ -95,11 +117,18 @@ class User extends Equatable {
       address: address ?? this.address,
       city: city ?? this.city,
       state: state ?? this.state,
+      district: district ?? this.district,
       country: country ?? this.country,
       pincode: pincode ?? this.pincode,
       identityProofType: identityProofType ?? this.identityProofType,
       identityProofNumber: identityProofNumber ?? this.identityProofNumber,
       identityProofImagePath: identityProofImagePath ?? this.identityProofImagePath,
+      educationCategory: educationCategory ?? this.educationCategory,
+      institutionName: institutionName ?? this.institutionName,
+      academicYear: academicYear ?? this.academicYear,
+      parentContact: parentContact ?? this.parentContact,
+      preferredLanguage: preferredLanguage ?? this.preferredLanguage,
+      passwordHash: passwordHash ?? this.passwordHash,
       isProfileComplete: isProfileComplete ?? this.isProfileComplete,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -116,11 +145,18 @@ class User extends Equatable {
       'address': address,
       'city': city,
       'state': state,
+      'district': district,
       'country': country,
       'pincode': pincode,
       'identity_proof_type': identityProofType,
       'identity_proof_number': identityProofNumber,
       'identity_proof_image_path': identityProofImagePath,
+      'education_category': educationCategory?.value,
+      'institution_name': institutionName,
+      'academic_year': academicYear,
+      'parent_contact': parentContact,
+      'preferred_language': preferredLanguage?.value,
+      'password_hash': passwordHash,
       'is_profile_complete': isProfileComplete,
       'created_at': createdAt?.toIso8601String(),
     };
@@ -137,11 +173,18 @@ class User extends Equatable {
       address: map['address'],
       city: map['city'],
       state: map['state'],
+      district: map['district'],
       country: map['country'],
       pincode: map['pincode'],
       identityProofType: map['identity_proof_type'],
       identityProofNumber: map['identity_proof_number'],
       identityProofImagePath: map['identity_proof_image_path'],
+      educationCategory: map['education_category'] != null ? EducationCategoryExtension.fromString(map['education_category']) : null,
+      institutionName: map['institution_name'],
+      academicYear: map['academic_year'],
+      parentContact: map['parent_contact'],
+      preferredLanguage: map['preferred_language'] != null ? LanguageExtension.fromString(map['preferred_language']) : null,
+      passwordHash: map['password_hash'],
       isProfileComplete: map['is_profile_complete'] ?? false,
       createdAt: map['created_at'] != null ? DateTime.parse(map['created_at']) : null,
     );
@@ -158,11 +201,18 @@ class User extends Equatable {
     address,
     city,
     state,
+    district,
     country,
     pincode,
     identityProofType,
     identityProofNumber,
     identityProofImagePath,
+    educationCategory,
+    institutionName,
+    academicYear,
+    parentContact,
+    preferredLanguage,
+    passwordHash,
     isProfileComplete,
     createdAt
   ];

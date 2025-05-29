@@ -6,6 +6,7 @@ import 'utils/utils.dart';
 import 'screens/splash_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/role_selection_screen.dart';
+import 'screens/test_registration_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/profile_completion_screen.dart';
 import 'services/services.dart';
@@ -141,6 +142,7 @@ class MyApp extends StatelessWidget {
           '/register': (context) => const RoleSelectionScreen(),
           '/home': (context) => const HomeScreen(),
           '/profile_completion': (context) => const ProfileCompletionScreen(),
+          '/test_registration': (context) => const TestRegistrationScreen(),
         }
       ),
     );

@@ -1,5 +1,7 @@
 export 'database_service.dart';
 export 'auth_service.dart';
+export 'multi_user_auth_service.dart';
+export 'neondb_service.dart';
 export 'test_service.dart';
 export 'recommendation_service.dart';
 export 'achievement_service.dart';

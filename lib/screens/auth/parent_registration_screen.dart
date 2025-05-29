@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/models.dart';
+import '../../models/parent_user.dart';
+import '../../services/multi_user_auth_service.dart';
 import '../../utils/utils.dart';
 import '../../widgets/widgets.dart';
 import 'login_screen.dart';
@@ -67,15 +69,32 @@ class _ParentRegistrationScreenState extends State<ParentRegistrationScreen> {
     });
 
     try {
-      // Here you would integrate with your enhanced auth service
-      // For now, we'll show a success message
+      final authService = MultiUserAuthService();
+
+      // Register parent with all collected data
+      final parentUser = await authService.registerParent(
+        fullName: _fullNameController.text.trim(),
+        email: _emailController.text.trim(),
+        phone: _phoneController.text.trim(),
+        occupation: _occupationController.text.trim(),
+        relationshipType: _selectedRelationship,
+        studentRegistrationId: _studentIdController.text.trim(),
+        address: _addressController.text.trim(),
+        state: _stateController.text.trim(),
+        district: _districtController.text.trim(),
+        city: _cityController.text.trim(),
+        pincode: _pincodeController.text.trim(),
+        preferredLanguage: _selectedLanguage,
+        password: _passwordController.text.trim(),
+      );
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Parent registration successful! Please wait for verification.'),
+          content: Text('Parent registration successful! Data saved to database.'),
           backgroundColor: AppColors.success,
+          duration: Duration(seconds: 3),
         ),
       );
 

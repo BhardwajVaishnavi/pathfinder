@@ -307,3 +307,47 @@ extension RelationshipTypeExtension on RelationshipType {
     }
   }
 }
+
+// Admin access levels for teachers
+enum AdminAccessLevel {
+  basic,
+  intermediate,
+  advanced,
+}
+
+extension AdminAccessLevelExtension on AdminAccessLevel {
+  String get value {
+    switch (this) {
+      case AdminAccessLevel.basic:
+        return 'basic';
+      case AdminAccessLevel.intermediate:
+        return 'intermediate';
+      case AdminAccessLevel.advanced:
+        return 'advanced';
+    }
+  }
+
+  String get displayName {
+    switch (this) {
+      case AdminAccessLevel.basic:
+        return 'Basic Access';
+      case AdminAccessLevel.intermediate:
+        return 'Intermediate Access';
+      case AdminAccessLevel.advanced:
+        return 'Advanced Access';
+    }
+  }
+
+  static AdminAccessLevel fromString(String value) {
+    switch (value.toLowerCase()) {
+      case 'basic':
+        return AdminAccessLevel.basic;
+      case 'intermediate':
+        return AdminAccessLevel.intermediate;
+      case 'advanced':
+        return AdminAccessLevel.advanced;
+      default:
+        return AdminAccessLevel.basic;
+    }
+  }
+}

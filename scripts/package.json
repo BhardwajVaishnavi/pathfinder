@@ -1,0 +1,35 @@
+{
+  "name": "pathfinder-ai-database-generator",
+  "version": "1.0.0",
+  "description": "Database generation script for PathfinderAI NeonDB PostgreSQL setup",
+  "main": "generate_database.js",
+  "scripts": {
+    "generate": "node generate_database.js",
+    "generate:unpooled": "node generate_database.js --unpooled",
+    "help": "node generate_database.js --help",
+    "test-connection": "node test_connection.js"
+  },
+  "dependencies": {
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.10.7"
+  },
+  "keywords": [
+    "pathfinder-ai",
+    "neondb",
+    "postgresql",
+    "database",
+    "setup",
+    "psychometric-tests"
+  ],
+  "author": "PathfinderAI Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BhardwajVaishnavi/pathfinder.git"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

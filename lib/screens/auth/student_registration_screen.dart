@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../models/models.dart';
 import '../../services/services.dart';
+import '../../services/multi_user_auth_service.dart';
 import '../../utils/utils.dart';
 import '../../widgets/widgets.dart';
 import '../profile_completion_screen.dart';
+import '../home_screen.dart';
 import 'login_screen.dart';
 
 class StudentRegistrationScreen extends StatefulWidget {
@@ -242,13 +244,45 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
     });
 
     try {
-      // Here you would integrate with your enhanced auth service
-      // For now, we'll navigate to profile completion
+      final authService = MultiUserAuthService();
+
+      // Register student with all collected data
+      final user = await authService.registerStudent(
+        fullName: _fullNameController.text.trim(),
+        email: _emailController.text.trim(),
+        phone: _phoneController.text.trim(),
+        dateOfBirth: _dateOfBirth!,
+        gender: _selectedGender,
+        password: _passwordController.text.trim(),
+        educationCategory: _selectedEducationCategory,
+        institutionName: _institutionController.text.trim(),
+        academicYear: _academicYearController.text.trim(),
+        parentContact: _parentContactController.text.trim(),
+        preferredLanguage: _selectedLanguage,
+        address: _addressController.text.trim(),
+        state: _stateController.text.trim(),
+        district: _districtController.text.trim(),
+        city: _cityController.text.trim(),
+        pincode: _pincodeController.text.trim(),
+        identityType: _selectedIdentityType,
+        identityNumber: _identityNumberController.text.trim(),
+        identityProofImage: _identityProofImage!,
+      );
 
       if (!mounted) return;
 
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Registration successful! Welcome to PathfinderAI!'),
+          backgroundColor: AppColors.success,
+          duration: Duration(seconds: 3),
+        ),
+      );
+
+      // Navigate to home screen since profile is complete
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const ProfileCompletionScreen()),
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
     } catch (e) {
       if (!mounted) return;

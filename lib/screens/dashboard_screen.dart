@@ -8,6 +8,7 @@ import 'analytics_screen.dart';
 import 'leaderboard_screen.dart';
 import 'notifications_screen.dart';
 import 'test/test_details_screen.dart';
+import 'test_registration_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -69,6 +70,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
         centerTitle: true,
         automaticallyImplyLeading: false,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.bug_report),
+            tooltip: 'Test Backend',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const TestRegistrationScreen()),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.notifications),
             tooltip: 'Notifications',

@@ -88,14 +88,31 @@ class CustomButton extends StatelessWidget {
 
   Widget _buildButtonContent() {
     if (isLoading) {
-      return const SizedBox(
+      return SizedBox(
         width: 24,
         height: 24,
         child: CircularProgressIndicator(
           strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.surface),
+          valueColor: AlwaysStoppedAnimation<Color>(
+            type == ButtonType.primary || type == ButtonType.secondary
+                ? AppColors.surface
+                : AppColors.primary
+          ),
         ),
       );
+    }
+
+    // Determine text color based on button type
+    Color textColor;
+    switch (type) {
+      case ButtonType.primary:
+      case ButtonType.secondary:
+        textColor = AppColors.surface; // White text on colored background
+        break;
+      case ButtonType.outline:
+      case ButtonType.text:
+        textColor = AppColors.primary; // Blue text on transparent/white background
+        break;
     }
 
     if (icon != null) {
@@ -103,13 +120,19 @@ class CustomButton extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: AppDimensions.iconSizeM),
+          Icon(icon, size: AppDimensions.iconSizeM, color: textColor),
           const SizedBox(width: AppDimensions.paddingS),
-          Text(text, style: AppTextStyles.button),
+          Text(
+            text,
+            style: AppTextStyles.button.copyWith(color: textColor),
+          ),
         ],
       );
     }
 
-    return Text(text, style: AppTextStyles.button);
+    return Text(
+      text,
+      style: AppTextStyles.button.copyWith(color: textColor),
+    );
   }
 }

@@ -14,6 +14,126 @@ class DatabaseService {
 
   DatabaseService._internal();
 
+  Future<void> initialize() async {
+    try {
+      await connect();
+      await _createTables();
+      print('✅ Database initialized successfully');
+    } catch (e) {
+      print('❌ Database initialization failed: $e');
+      // Continue without database for testing
+    }
+  }
+
+  Future<void> _createTables() async {
+    if (kIsWeb) {
+      print('Running on web platform, skipping table creation');
+      return;
+    }
+
+    try {
+      // Create categories table
+      await execute('''
+        CREATE TABLE IF NOT EXISTS categories (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(255) NOT NULL,
+          description TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      ''');
+
+      // Create test_sets table
+      await execute('''
+        CREATE TABLE IF NOT EXISTS test_sets (
+          id SERIAL PRIMARY KEY,
+          category_id INTEGER REFERENCES categories(id),
+          name VARCHAR(255) NOT NULL,
+          description TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      ''');
+
+      // Create questions table
+      await execute('''
+        CREATE TABLE IF NOT EXISTS questions (
+          id SERIAL PRIMARY KEY,
+          test_set_id INTEGER REFERENCES test_sets(id),
+          question_text TEXT NOT NULL,
+          option_a TEXT NOT NULL,
+          option_b TEXT NOT NULL,
+          option_c TEXT NOT NULL,
+          option_d TEXT NOT NULL,
+          correct_answer CHAR(1) NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      ''');
+
+      // Create users table
+      await execute('''
+        CREATE TABLE IF NOT EXISTS users (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(255) NOT NULL,
+          email VARCHAR(255) UNIQUE,
+          phone VARCHAR(20),
+          date_of_birth DATE,
+          gender VARCHAR(10),
+          address TEXT,
+          city VARCHAR(100),
+          state VARCHAR(100),
+          country VARCHAR(100),
+          pincode VARCHAR(10),
+          education_category VARCHAR(100),
+          institution_name VARCHAR(255),
+          academic_year VARCHAR(20),
+          parent_contact VARCHAR(20),
+          preferred_language VARCHAR(50),
+          identity_proof_type VARCHAR(100),
+          identity_proof_number VARCHAR(100),
+          identity_proof_image_path TEXT,
+          password_hash VARCHAR(255),
+          is_profile_complete BOOLEAN DEFAULT FALSE,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      ''');
+
+      // Create user_responses table
+      await execute('''
+        CREATE TABLE IF NOT EXISTS user_responses (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER NOT NULL,
+          question_id INTEGER NOT NULL,
+          selected_option VARCHAR(10),
+          is_correct BOOLEAN,
+          response_time INTEGER,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      ''');
+
+      // Create reports table
+      await execute('''
+        CREATE TABLE IF NOT EXISTS reports (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER NOT NULL,
+          test_set_id INTEGER NOT NULL,
+          total_questions INTEGER NOT NULL,
+          correct_answers INTEGER NOT NULL,
+          incorrect_answers INTEGER NOT NULL,
+          score INTEGER NOT NULL,
+          percentage DECIMAL(5,2) NOT NULL,
+          strengths TEXT,
+          areas_for_improvement TEXT,
+          recommendations TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      ''');
+
+      print('✅ Database tables created successfully');
+    } catch (e) {
+      print('❌ Error creating tables: $e');
+      // Don't rethrow - continue without database
+    }
+  }
+
   Future<void> connect() async {
     if (_isConnected) return;
 

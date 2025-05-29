@@ -121,7 +121,7 @@ class Student extends Equatable {
       'gender': gender.value,
       'email': email,
       'phone': phone,
-      'education_category': educationCategory.value,
+      'education_category': educationCategory.toString().split('.').last,
       'current_institution': currentInstitution,
       'academic_year': academicYear,
       'parent_guardian_contact': parentGuardianContact,

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../../services/services.dart';
 import '../../utils/utils.dart';
 import '../../widgets/widgets.dart';
+import '../../models/user.dart';
+import '../../models/parent_user.dart';
+import '../../models/teacher_user.dart';
 import 'role_selection_screen.dart';
 import '../home_screen.dart';
 import '../profile_completion_screen.dart';
@@ -53,24 +56,52 @@ class _LoginScreenState extends State<LoginScreen> {
       final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
 
-      // Login user
-      final authService = AuthService();
-      await authService.login(email, password);
+      // Login user using MultiUserAuthService
+      final authService = MultiUserAuthService();
+      final user = await authService.login(email, password);
 
       if (!mounted) return;
 
-      // Check if user profile is complete
-      if (!authService.isUserProfileComplete()) {
-        // Navigate to profile completion screen
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const ProfileCompletionScreen()),
-        );
-      } else {
-        // Navigate to home screen on successful login
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
-        );
+      // Get user name and type from auth service
+      String userName = 'User';
+      String userType = authService.currentUserType?.toString().split('.').last ?? 'user';
+
+      // Get user name from current user object
+      if (authService.currentUser != null) {
+        final currentUser = authService.currentUser!;
+        // Handle different user types
+        if (currentUser is User && currentUser.name.isNotEmpty) {
+          userName = currentUser.name;
+        } else if (currentUser is ParentUser && currentUser.name.isNotEmpty) {
+          userName = currentUser.name;
+        } else if (currentUser is TeacherUser && currentUser.name.isNotEmpty) {
+          userName = currentUser.name;
+        } else {
+          // Fallback to extracting name from any object with a name property
+          try {
+            final dynamic userObj = currentUser;
+            if (userObj.name != null && userObj.name.toString().isNotEmpty) {
+              userName = userObj.name.toString();
+            }
+          } catch (e) {
+            print('⚠️ Could not extract user name: $e');
+          }
+        }
       }
+
+      // Show success message with user type
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Welcome $userName! ($userType)'),
+          backgroundColor: AppColors.success,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      // Navigate to home screen on successful login
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
     } catch (e) {
       // Show error message
       if (!mounted) return;
@@ -88,6 +119,58 @@ class _LoginScreenState extends State<LoginScreen> {
         });
       }
     }
+  }
+
+  Widget _buildTestCredential(String role, String email, String password) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppDimensions.paddingXS),
+      child: GestureDetector(
+        onTap: () {
+          _emailController.text = email;
+          _passwordController.text = password;
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.paddingS,
+            vertical: AppDimensions.paddingXS,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusS),
+            border: Border.all(color: AppColors.divider.withOpacity(0.3)),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      role,
+                      style: AppTextStyles.caption.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.info,
+                      ),
+                    ),
+                    Text(
+                      email,
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.textSecondary.withOpacity(0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.touch_app,
+                size: 16,
+                color: AppColors.info.withOpacity(0.7),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -179,6 +262,33 @@ class _LoginScreenState extends State<LoginScreen> {
                     isFullWidth: true,
                   ),
                   const SizedBox(height: AppDimensions.paddingXL),
+
+                  // Test credentials section
+                  Container(
+                    padding: const EdgeInsets.all(AppDimensions.paddingM),
+                    decoration: BoxDecoration(
+                      color: AppColors.info.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                      border: Border.all(color: AppColors.info.withOpacity(0.3)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '🔑 Test Login Credentials',
+                          style: AppTextStyles.subtitle2.copyWith(
+                            color: AppColors.info,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: AppDimensions.paddingS),
+                        _buildTestCredential('👥 Student', 'rahul.student@pathfinder.ai', 'student123'),
+                        _buildTestCredential('👨‍👩‍👧‍👦 Parent', 'suresh.parent@pathfinder.ai', 'parent123'),
+                        _buildTestCredential('👨‍🏫 Teacher', 'anjali.teacher@pathfinder.ai', 'teacher123'),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppDimensions.paddingL),
 
                   // Register link
                   Row(

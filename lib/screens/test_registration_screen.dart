@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+// import 'package:image_picker/image_picker.dart'; // Removed for build
 import '../models/models.dart';
 import '../models/parent_user.dart';
 import '../models/teacher_user.dart';
@@ -27,17 +27,8 @@ class _TestRegistrationScreenState extends State<TestRegistrationScreen> {
     try {
       final authService = MultiUserAuthService();
 
-      // Create a dummy image file for testing
-      final ImagePicker picker = ImagePicker();
-      final XFile? dummyImage = await picker.pickImage(source: ImageSource.gallery);
-
-      if (dummyImage == null) {
-        setState(() {
-          _result = 'No image selected. Please select an image to test registration.';
-          _isLoading = false;
-        });
-        return;
-      }
+      // Use dummy image path for testing
+      const String dummyImagePath = 'dummy_identity_proof.jpg';
 
       final user = await authService.registerStudent(
         fullName: 'Test Student',
@@ -58,7 +49,7 @@ class _TestRegistrationScreenState extends State<TestRegistrationScreen> {
         pincode: '123456',
         identityType: 'Aadhaar Card',
         identityNumber: '123456789012',
-        identityProofImage: dummyImage,
+        identityProofImagePath: dummyImagePath,
       );
 
       setState(() {

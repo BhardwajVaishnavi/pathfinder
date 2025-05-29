@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+// import 'package:flutter_spinkit/flutter_spinkit.dart'; // Removed for build
 import '../utils/utils.dart';
 
 class LoadingIndicator extends StatelessWidget {
@@ -20,9 +20,8 @@ class LoadingIndicator extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SpinKitDoubleBounce(
-            color: color,
-            size: size,
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(color),
           ),
           if (message != null) ...[
             const SizedBox(height: AppDimensions.paddingM),

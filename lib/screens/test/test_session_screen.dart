@@ -139,19 +139,35 @@ class _TestSessionScreenState extends State<TestSessionScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Submit Test'),
-        content: const Text('Are you sure you want to submit your test? You cannot change your answers after submission.'),
+        title: Text(
+          'Submit Test',
+          style: AppTextStyles.headline3.copyWith(color: AppColors.textPrimary),
+        ),
+        content: Text(
+          'Are you sure you want to submit your test? You cannot change your answers after submission.',
+          style: AppTextStyles.bodyText1.copyWith(color: AppColors.textPrimary),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text(AppStrings.cancel),
+            child: Text(
+              AppStrings.cancel,
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
               _submitTest();
             },
-            child: const Text(AppStrings.confirm),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.surface,
+            ),
+            child: Text(
+              AppStrings.confirm,
+              style: TextStyle(color: AppColors.surface),
+            ),
           ),
         ],
       ),
@@ -168,12 +184,22 @@ class _TestSessionScreenState extends State<TestSessionScreen> {
       final timeSpentInSeconds = (widget.testSet.timeLimit ?? 60) * 60 - _remainingSeconds;
 
       // Submit test using the test service
+      print('🚀 Submitting test with ${_userResponses.length} responses');
+      print('📊 Test set ID: ${widget.testSet.id}');
+      print('⏱️ Time spent: ${timeSpentInSeconds}s');
+
       final report = await _testService.submitTest(
         widget.testSet.id,
         widget.questions,
         _userResponses,
         timeSpentInSeconds,
       );
+
+      print('✅ Report generated successfully');
+      print('📈 Score: ${report.score}');
+      print('📊 Percentage: ${report.percentage}%');
+      print('✅ Correct: ${report.correctAnswers}');
+      print('❌ Incorrect: ${report.incorrectAnswers}');
 
       // Generate user responses for display
       final List<UserResponse> userResponses = [];
@@ -194,6 +220,11 @@ class _TestSessionScreenState extends State<TestSessionScreen> {
       }
 
       if (!mounted) return;
+
+      // Mark test as completed
+      final completionService = TestCompletionService();
+      final testType = completionService.getTestTypeFromTestSet(widget.testSet);
+      await completionService.markTestCompleted(testType);
 
       // Navigate to results screen
       Navigator.of(context).pushReplacement(
@@ -229,16 +260,32 @@ class _TestSessionScreenState extends State<TestSessionScreen> {
         final shouldPop = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Exit Test'),
-            content: const Text('Are you sure you want to exit the test? Your progress will be lost.'),
+            title: Text(
+              'Exit Test',
+              style: AppTextStyles.headline3.copyWith(color: AppColors.textPrimary),
+            ),
+            content: Text(
+              'Are you sure you want to exit the test? Your progress will be lost.',
+              style: AppTextStyles.bodyText1.copyWith(color: AppColors.textPrimary),
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: const Text(AppStrings.cancel),
+                child: Text(
+                  AppStrings.cancel,
+                  style: TextStyle(color: AppColors.textSecondary),
+                ),
               ),
               ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Exit'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.error,
+                  foregroundColor: AppColors.surface,
+                ),
+                child: Text(
+                  'Exit',
+                  style: TextStyle(color: AppColors.surface),
+                ),
               ),
             ],
           ),
@@ -271,7 +318,7 @@ class _TestSessionScreenState extends State<TestSessionScreen> {
                     Text(
                       _formattedTime,
                       style: AppTextStyles.bodyText2.copyWith(
-                        color: _remainingSeconds < 300 ? AppColors.error : AppColors.surface,
+                        color: _remainingSeconds < 300 ? AppColors.error : AppColors.textPrimary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -301,11 +348,16 @@ class _TestSessionScreenState extends State<TestSessionScreen> {
                       children: [
                         Text(
                           'Question ${_currentIndex + 1} of ${widget.questions.length}',
-                          style: AppTextStyles.subtitle2,
+                          style: AppTextStyles.subtitle2.copyWith(
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
                           'Time remaining: ${_formatTime(_remainingSeconds)}',
-                          style: AppTextStyles.subtitle2,
+                          style: AppTextStyles.subtitle2.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ],
                     ),
@@ -332,32 +384,41 @@ class _TestSessionScreenState extends State<TestSessionScreen> {
                   ),
 
                   // Navigation buttons
-                  Padding(
+                  Container(
                     padding: const EdgeInsets.all(AppDimensions.paddingL),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        // Previous button
                         if (_currentIndex > 0)
-                          CustomButton(
-                            text: AppStrings.previousQuestion,
-                            onPressed: () => _navigateToQuestion(_currentIndex - 1),
-                            type: ButtonType.outline,
-                            icon: Icons.arrow_back,
+                          Expanded(
+                            flex: 1,
+                            child: CustomButton(
+                              text: 'Previous',
+                              onPressed: () => _navigateToQuestion(_currentIndex - 1),
+                              type: ButtonType.outline,
+                              icon: Icons.arrow_back,
+                            ),
                           )
                         else
-                          const SizedBox(),
-                        if (_currentIndex < widget.questions.length - 1)
-                          CustomButton(
-                            text: AppStrings.nextQuestion,
-                            onPressed: () => _navigateToQuestion(_currentIndex + 1),
-                            icon: Icons.arrow_forward,
-                          )
-                        else
-                          CustomButton(
-                            text: AppStrings.submitTest,
-                            onPressed: _showSubmitConfirmation,
-                            icon: Icons.check_circle,
-                          ),
+                          const Expanded(flex: 1, child: SizedBox()),
+
+                        const SizedBox(width: AppDimensions.paddingM),
+
+                        // Next/Submit button
+                        Expanded(
+                          flex: 1,
+                          child: _currentIndex < widget.questions.length - 1
+                              ? CustomButton(
+                                  text: 'Next',
+                                  onPressed: () => _navigateToQuestion(_currentIndex + 1),
+                                  icon: Icons.arrow_forward,
+                                )
+                              : CustomButton(
+                                  text: 'Submit',
+                                  onPressed: _showSubmitConfirmation,
+                                  icon: Icons.check_circle,
+                                ),
+                        ),
                       ],
                     ),
                   ),
@@ -437,7 +498,10 @@ class _TestSessionScreenState extends State<TestSessionScreen> {
       children: [
         Text(
           question.questionText,
-          style: AppTextStyles.headline3,
+          style: AppTextStyles.headline3.copyWith(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         const SizedBox(height: AppDimensions.paddingXL),
 
@@ -525,6 +589,7 @@ class _TestSessionScreenState extends State<TestSessionScreen> {
               child: Text(
                 optionText,
                 style: AppTextStyles.bodyText1.copyWith(
+                  color: AppColors.textPrimary,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
               ),

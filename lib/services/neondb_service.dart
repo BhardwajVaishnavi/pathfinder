@@ -66,6 +66,9 @@ class NeonDBService {
 
     print('📋 Creating tables in NeonDB...');
 
+    // Pre-populate with seeded test data for web simulation
+    await _populateTestData();
+
     // In production, these would be actual SQL CREATE TABLE statements
     final createStudentsTable = '''
       CREATE TABLE IF NOT EXISTS students (
@@ -143,10 +146,41 @@ class NeonDBService {
       );
     ''';
 
+    final createUserResponsesTable = '''
+      CREATE TABLE IF NOT EXISTS user_responses (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        question_id INTEGER NOT NULL,
+        selected_option VARCHAR(10),
+        is_correct BOOLEAN,
+        response_time INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    ''';
+
+    final createReportsTable = '''
+      CREATE TABLE IF NOT EXISTS reports (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        test_set_id INTEGER NOT NULL,
+        total_questions INTEGER NOT NULL,
+        correct_answers INTEGER NOT NULL,
+        incorrect_answers INTEGER NOT NULL,
+        score INTEGER NOT NULL,
+        percentage DECIMAL(5,2) NOT NULL,
+        strengths TEXT,
+        areas_for_improvement TEXT,
+        recommendations TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    ''';
+
     // Log the SQL statements that would be executed
     print('🔧 SQL: $createStudentsTable');
     print('🔧 SQL: $createParentsTable');
     print('🔧 SQL: $createTeachersTable');
+    print('🔧 SQL: $createUserResponsesTable');
+    print('🔧 SQL: $createReportsTable');
 
     // Create indexes
     print('🔍 Creating indexes for better performance...');
@@ -156,6 +190,214 @@ class NeonDBService {
     print('🔧 SQL: CREATE INDEX IF NOT EXISTS idx_teachers_employee_id ON teachers(employee_id);');
 
     print('✅ Tables and indexes created successfully in NeonDB');
+  }
+
+  // Populate test data for web simulation
+  Future<void> _populateTestData() async {
+    print('🌱 Populating test data for web simulation...');
+
+    // Test students data (matching seeded data)
+    _students['rahul.student@pathfinder.ai'] = {
+      'id': 1,
+      'full_name': 'Rahul Sharma',
+      'email': 'rahul.student@pathfinder.ai',
+      'phone': '9876543210',
+      'date_of_birth': '2005-03-15',
+      'gender': 'male',
+      'education_category': 'tenth_fail',
+      'current_institution': 'Delhi Public School',
+      'academic_year': '2023-24',
+      'parent_guardian_contact': '9876543211',
+      'preferred_language': 'english',
+      'address': '123 Student Street, New Delhi',
+      'state': 'Delhi',
+      'district': 'Central Delhi',
+      'city': 'New Delhi',
+      'pincode': '110001',
+      'identity_proof_type': 'Aadhaar Card',
+      'identity_proof_number': '1234-5678-9012',
+      'password_hash': 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', // student123 hashed
+      'is_profile_complete': true,
+      'is_verified': true,
+      'created_at': DateTime.now().toIso8601String(),
+    };
+
+    _students['priya.student@pathfinder.ai'] = {
+      'id': 2,
+      'full_name': 'Priya Patel',
+      'email': 'priya.student@pathfinder.ai',
+      'phone': '9876543212',
+      'date_of_birth': '2004-07-22',
+      'gender': 'female',
+      'education_category': 'undergraduate',
+      'current_institution': 'Mumbai University',
+      'academic_year': '2023-24',
+      'parent_guardian_contact': '9876543213',
+      'preferred_language': 'english',
+      'address': '456 College Road, Mumbai',
+      'state': 'Maharashtra',
+      'district': 'Mumbai',
+      'city': 'Mumbai',
+      'pincode': '400001',
+      'identity_proof_type': 'Aadhaar Card',
+      'identity_proof_number': '2345-6789-0123',
+      'password_hash': 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', // student123 hashed
+      'is_profile_complete': true,
+      'is_verified': true,
+      'created_at': DateTime.now().toIso8601String(),
+    };
+
+    _students['arjun.student@pathfinder.ai'] = {
+      'id': 3,
+      'full_name': 'Arjun Singh',
+      'email': 'arjun.student@pathfinder.ai',
+      'phone': '9876543214',
+      'date_of_birth': '2003-11-08',
+      'gender': 'male',
+      'education_category': 'engineering_cse',
+      'current_institution': 'IIT Delhi',
+      'academic_year': '2023-24',
+      'parent_guardian_contact': '9876543215',
+      'preferred_language': 'english',
+      'address': '789 Tech Campus, Delhi',
+      'state': 'Delhi',
+      'district': 'South Delhi',
+      'city': 'New Delhi',
+      'pincode': '110016',
+      'identity_proof_type': 'Aadhaar Card',
+      'identity_proof_number': '3456-7890-1234',
+      'password_hash': 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', // student123 hashed
+      'is_profile_complete': true,
+      'is_verified': true,
+      'created_at': DateTime.now().toIso8601String(),
+    };
+
+    // Test parents data
+    _parents['suresh.parent@pathfinder.ai'] = {
+      'id': 1,
+      'full_name': 'Suresh Sharma',
+      'email': 'suresh.parent@pathfinder.ai',
+      'phone': '9876543211',
+      'occupation': 'Software Engineer',
+      'relationship_to_student': 'father',
+      'address': '123 Student Street, New Delhi',
+      'state': 'Delhi',
+      'district': 'Central Delhi',
+      'city': 'New Delhi',
+      'pincode': '110001',
+      'preferred_language': 'english',
+      'password_hash': '6ca13d52ca70c883e0f0bb101e425a89e8624de51db2d2392593af6a84118090', // parent123 hashed
+      'is_verified': true,
+      'created_at': DateTime.now().toIso8601String(),
+    };
+
+    _parents['meera.parent@pathfinder.ai'] = {
+      'id': 2,
+      'full_name': 'Meera Patel',
+      'email': 'meera.parent@pathfinder.ai',
+      'phone': '9876543213',
+      'occupation': 'Doctor',
+      'relationship_to_student': 'mother',
+      'address': '456 College Road, Mumbai',
+      'state': 'Maharashtra',
+      'district': 'Mumbai',
+      'city': 'Mumbai',
+      'pincode': '400001',
+      'preferred_language': 'english',
+      'password_hash': '6ca13d52ca70c883e0f0bb101e425a89e8624de51db2d2392593af6a84118090', // parent123 hashed
+      'is_verified': true,
+      'created_at': DateTime.now().toIso8601String(),
+    };
+
+    _parents['rajesh.parent@pathfinder.ai'] = {
+      'id': 3,
+      'full_name': 'Rajesh Singh',
+      'email': 'rajesh.parent@pathfinder.ai',
+      'phone': '9876543215',
+      'occupation': 'Business Owner',
+      'relationship_to_student': 'father',
+      'address': '789 Tech Campus, Delhi',
+      'state': 'Delhi',
+      'district': 'South Delhi',
+      'city': 'New Delhi',
+      'pincode': '110016',
+      'preferred_language': 'english',
+      'password_hash': '6ca13d52ca70c883e0f0bb101e425a89e8624de51db2d2392593af6a84118090', // parent123 hashed
+      'is_verified': true,
+      'created_at': DateTime.now().toIso8601String(),
+    };
+
+    // Test teachers data
+    _teachers['anjali.teacher@pathfinder.ai'] = {
+      'id': 1,
+      'full_name': 'Dr. Anjali Verma',
+      'employee_id': 'TCH001',
+      'institution_name': 'Delhi Public School',
+      'designation': 'Senior Mathematics Teacher',
+      'subject_expertise': 'Mathematics,Physics,Computer Science',
+      'email': 'anjali.teacher@pathfinder.ai',
+      'phone': '9876543220',
+      'years_of_experience': 12,
+      'institution_address': '123 School Street, New Delhi',
+      'state': 'Delhi',
+      'district': 'Central Delhi',
+      'city': 'New Delhi',
+      'pincode': '110001',
+      'access_level': 'advanced',
+      'preferred_language': 'english',
+      'password_hash': '0b14d501a594442a01c6859541bcb3e8164d183d32937b851835442f69d5c94e', // teacher123 hashed
+      'is_verified': true,
+      'is_active': true,
+      'created_at': DateTime.now().toIso8601String(),
+    };
+
+    _teachers['vikram.teacher@pathfinder.ai'] = {
+      'id': 2,
+      'full_name': 'Prof. Vikram Kumar',
+      'employee_id': 'TCH002',
+      'institution_name': 'Mumbai University',
+      'designation': 'Associate Professor',
+      'subject_expertise': 'Psychology,Career Counseling,Education',
+      'email': 'vikram.teacher@pathfinder.ai',
+      'phone': '9876543221',
+      'years_of_experience': 15,
+      'institution_address': '456 University Road, Mumbai',
+      'state': 'Maharashtra',
+      'district': 'Mumbai',
+      'city': 'Mumbai',
+      'pincode': '400001',
+      'access_level': 'advanced',
+      'preferred_language': 'english',
+      'password_hash': '0b14d501a594442a01c6859541bcb3e8164d183d32937b851835442f69d5c94e', // teacher123 hashed
+      'is_verified': true,
+      'is_active': true,
+      'created_at': DateTime.now().toIso8601String(),
+    };
+
+    _teachers['ravi.teacher@pathfinder.ai'] = {
+      'id': 3,
+      'full_name': 'Dr. Ravi Gupta',
+      'employee_id': 'TCH003',
+      'institution_name': 'IIT Delhi',
+      'designation': 'Assistant Professor',
+      'subject_expertise': 'Computer Science,Engineering,Technology',
+      'email': 'ravi.teacher@pathfinder.ai',
+      'phone': '9876543222',
+      'years_of_experience': 8,
+      'institution_address': '789 IIT Campus, Delhi',
+      'state': 'Delhi',
+      'district': 'South Delhi',
+      'city': 'New Delhi',
+      'pincode': '110016',
+      'access_level': 'intermediate',
+      'preferred_language': 'english',
+      'password_hash': '0b14d501a594442a01c6859541bcb3e8164d183d32937b851835442f69d5c94e', // teacher123 hashed
+      'is_verified': true,
+      'is_active': true,
+      'created_at': DateTime.now().toIso8601String(),
+    };
+
+    print('✅ Test data populated: ${_students.length} students, ${_parents.length} parents, ${_teachers.length} teachers');
   }
 
   // Execute SQL via API (for production)
@@ -220,7 +462,7 @@ class NeonDBService {
         '3': student.phone,
         '4': student.dateOfBirth?.toIso8601String(),
         '5': student.gender?.value,
-        '6': student.educationCategory?.value,
+        '6': student.educationCategory?.toString().split('.').last,
         '7': student.institutionName,
         '8': student.academicYear,
         '9': student.parentContact,
@@ -269,7 +511,7 @@ class NeonDBService {
       'phone': student.phone,
       'date_of_birth': student.dateOfBirth?.toIso8601String(),
       'gender': student.gender?.value,
-      'education_category': student.educationCategory?.value,
+      'education_category': student.educationCategory?.toString().split('.').last,
       'current_institution': student.institutionName,
       'academic_year': student.academicYear,
       'parent_guardian_contact': student.parentContact,

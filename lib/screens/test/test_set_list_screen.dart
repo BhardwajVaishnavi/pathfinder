@@ -20,11 +20,13 @@ class TestSetListScreen extends StatefulWidget {
 
 class _TestSetListScreenState extends State<TestSetListScreen> {
   final TestService _testService = TestService();
-  final AuthService _authService = AuthService();
+  final MultiUserAuthService _authService = MultiUserAuthService();
+  final TestCompletionService _completionService = TestCompletionService();
 
   bool _isLoading = false;
   List<TestSet> _testSets = [];
   String _errorMessage = '';
+  Map<String, bool> _completionStatus = {};
 
   @override
   void initState() {
@@ -33,8 +35,10 @@ class _TestSetListScreenState extends State<TestSetListScreen> {
   }
 
   void _checkProfileCompletion() {
-    // Check if user profile is complete
-    if (!_authService.isUserProfileComplete()) {
+    // For test users, profile is already complete, so load test sets directly
+    if (_authService.isLoggedIn && _authService.currentUser?.isProfileComplete == true) {
+      _loadTestSets();
+    } else {
       // Show a dialog to inform the user
       WidgetsBinding.instance.addPostFrameCallback((_) {
         showDialog(
@@ -62,8 +66,6 @@ class _TestSetListScreenState extends State<TestSetListScreen> {
           ),
         );
       });
-    } else {
-      _loadTestSets();
     }
   }
 
@@ -76,6 +78,13 @@ class _TestSetListScreenState extends State<TestSetListScreen> {
     try {
       // Load test sets for the selected category using the test service
       _testSets = await _testService.getTestSetsForCategory(widget.category.id);
+
+      // Load completion status for each test
+      _completionStatus = await _completionService.getTestCompletionStatus();
+
+      print('📊 Test completion status: $_completionStatus');
+      print('📝 Available test sets: ${_testSets.map((t) => t.title).toList()}');
+
     } catch (e) {
       setState(() {
         _errorMessage = 'Failed to load tests: ${e.toString()}';
@@ -88,8 +97,39 @@ class _TestSetListScreenState extends State<TestSetListScreen> {
   }
 
   void _navigateToTestDetails(TestSet testSet) {
-    // Check if user profile is complete before navigating
-    if (!_authService.isUserProfileComplete()) {
+    // Check if test is already completed
+    final testType = _completionService.getTestTypeFromTestSet(testSet);
+    final isCompleted = _completionStatus[testType] ?? false;
+
+    if (isCompleted) {
+      // Show dialog that test is already completed
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Test Already Completed'),
+          content: Text(
+            'You have already completed the ${testSet.title}. '
+            'Each test can only be taken once to ensure fair assessment.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    // For test users, profile is already complete, so navigate directly
+    if (_authService.isLoggedIn && _authService.currentUser?.isProfileComplete == true) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => TestDetailsScreen(testSet: testSet),
+        ),
+      );
+    } else {
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -112,12 +152,6 @@ class _TestSetListScreenState extends State<TestSetListScreen> {
               child: const Text('Complete Profile'),
             ),
           ],
-        ),
-      );
-    } else {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => TestDetailsScreen(testSet: testSet),
         ),
       );
     }
@@ -156,6 +190,9 @@ class _TestSetListScreenState extends State<TestSetListScreen> {
   }
 
   Widget _buildTestSetCard(TestSet testSet) {
+    final testType = _completionService.getTestTypeFromTestSet(testSet);
+    final isCompleted = _completionStatus[testType] ?? false;
+
     return Card(
       margin: const EdgeInsets.only(bottom: AppDimensions.paddingM),
       elevation: 2,
@@ -175,13 +212,15 @@ class _TestSetListScreenState extends State<TestSetListScreen> {
                   Container(
                     padding: const EdgeInsets.all(AppDimensions.paddingM),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: isCompleted
+                          ? AppColors.success.withOpacity(0.1)
+                          : AppColors.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                     ),
-                    child: const Icon(
-                      Icons.assignment_outlined,
+                    child: Icon(
+                      isCompleted ? Icons.check_circle : Icons.assignment_outlined,
                       size: 32,
-                      color: AppColors.primary,
+                      color: isCompleted ? AppColors.success : AppColors.primary,
                     ),
                   ),
                   const SizedBox(width: AppDimensions.paddingM),
@@ -189,9 +228,34 @@ class _TestSetListScreenState extends State<TestSetListScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          testSet.title,
-                          style: AppTextStyles.subtitle1,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                testSet.title,
+                                style: AppTextStyles.subtitle1,
+                              ),
+                            ),
+                            if (isCompleted)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.success,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Text(
+                                  'Completed',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                         if (testSet.timeLimit != null) ...[
                           const SizedBox(height: AppDimensions.paddingXS),
@@ -224,9 +288,10 @@ class _TestSetListScreenState extends State<TestSetListScreen> {
                       ),
                     ),
                   CustomButton(
-                    text: 'Start Test',
+                    text: isCompleted ? 'Completed' : 'Start Test',
                     onPressed: () => _navigateToTestDetails(testSet),
                     type: ButtonType.outline,
+                    icon: isCompleted ? Icons.check : null,
                   ),
                 ],
               ),

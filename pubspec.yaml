@@ -44,13 +44,13 @@ dependencies:
   sqflite: ^2.3.0
   path_provider: ^2.1.1
 
-  # UI components
-  flutter_colorpicker: ^1.1.0
-  flutter_svg: ^2.0.9
-  google_fonts: ^6.1.0
-  flutter_spinkit: ^5.2.0
-  percent_indicator: ^4.2.3
-  fl_chart: ^0.66.0
+  # UI components - minimal for build
+  # flutter_colorpicker: ^1.1.0
+  # flutter_svg: ^2.0.9
+  # google_fonts: ^6.1.0
+  # flutter_spinkit: ^5.2.0
+  # percent_indicator: ^4.2.3
+  # fl_chart: ^0.66.0
 
   # Utilities
   http: ^1.1.2
@@ -60,14 +60,18 @@ dependencies:
   equatable: ^2.0.5
   crypto: ^3.0.3
 
-  # Notifications
-  flutter_local_notifications: ^16.3.0
-  timezone: ^0.9.2
+  # PDF Generation and Download
+  pdf: ^3.10.7
+  universal_html: ^2.2.4
 
-  # Sharing
-  share_plus: ^7.2.1
-  url_launcher: ^6.2.4
-  image_picker: ^1.1.2
+  # Notifications - temporarily removed for build
+  # flutter_local_notifications: ^16.3.0
+  # timezone: ^0.9.2
+
+  # Sharing - temporarily removed for build
+  # share_plus: ^7.2.1
+  # url_launcher: ^6.2.4
+  # image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

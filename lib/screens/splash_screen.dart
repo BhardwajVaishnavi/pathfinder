@@ -44,36 +44,38 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   }
 
   Future<void> _navigateToNextScreen() async {
-    // Check if user is already logged in
-    final authService = AuthService();
-    await authService.initialize();
+    try {
+      // Check if user is already logged in
+      final authService = MultiUserAuthService();
+      await authService.initialize();
 
-    // Check if first time using the app
-    final preferencesManager = PreferencesManager();
-    final isFirstTime = await preferencesManager.isFirstTime();
+      // Check if first time using the app
+      final preferencesManager = PreferencesManager();
+      final isFirstTime = await preferencesManager.isFirstTime();
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    if (isFirstTime) {
-      // First time using the app, show onboarding
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
-      );
-    } else if (authService.isLoggedIn) {
-      // Check if user profile is complete
-      if (!authService.isUserProfileComplete()) {
-        // Profile is not complete, go to profile completion screen
+      if (isFirstTime) {
+        // First time using the app, show onboarding
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const ProfileCompletionScreen()),
+          MaterialPageRoute(builder: (_) => const OnboardingScreen()),
         );
-      } else {
-        // Profile is complete, go to home screen
+      } else if (authService.isLoggedIn) {
+        // User is logged in, go to home screen
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const HomeScreen()),
         );
+      } else {
+        // User is not logged in, go to login screen
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
       }
-    } else {
-      // User is not logged in, go to login screen
+    } catch (e) {
+      print('Navigation error: $e - defaulting to login screen');
+      if (!mounted) return;
+
+      // Default to login screen if there's any error
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const LoginScreen()),
       );

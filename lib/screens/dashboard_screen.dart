@@ -19,7 +19,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final RecommendationService _recommendationService = RecommendationService();
-  final AuthService _authService = AuthService();
+  final MultiUserAuthService _authService = MultiUserAuthService();
 
   bool _isLoading = true;
   String _errorMessage = '';
@@ -43,8 +43,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
 
     try {
-      // Initialize auth service
-      await _authService.initialize();
+      // Check if user is logged in
+      if (!_authService.isLoggedIn) {
+        throw Exception('User not logged in');
+      }
 
       // Load performance insights
       _insights = await _recommendationService.getPerformanceInsights();
@@ -53,13 +55,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _recommendedTests = await _recommendationService.getRecommendedTests();
     } catch (e) {
       setState(() {
-        _errorMessage = 'Failed to load dashboard data: ${e.toString()}';
+        _errorMessage = 'Failed to load user data: ${e.toString()}';
       });
     } finally {
       setState(() {
         _isLoading = false;
       });
     }
+  }
+
+  String _getUserName() {
+    if (_authService.currentUser != null) {
+      try {
+        final user = _authService.currentUser!;
+        if (user.name != null && user.name!.isNotEmpty) {
+          return user.name!;
+        }
+      } catch (e) {
+        print('Error getting user name: $e');
+      }
+    }
+
+    // Fallback to user type or default
+    final userType = _authService.currentUserType?.toString().split('.').last ?? 'user';
+    return userType.capitalize();
   }
 
   @override
@@ -97,15 +116,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               );
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.leaderboard),
-            tooltip: 'Leaderboard',
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
-              );
-            },
-          ),
+
         ],
       ),
       body: _isLoading
@@ -151,7 +162,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Welcome, ${_authService.currentUserName ?? 'User'}!',
+              'Welcome, ${_getUserName()}!',
               style: AppTextStyles.headline2,
             ),
             const SizedBox(height: AppDimensions.paddingS),

@@ -151,7 +151,7 @@ class User extends Equatable {
       'identity_proof_type': identityProofType,
       'identity_proof_number': identityProofNumber,
       'identity_proof_image_path': identityProofImagePath,
-      'education_category': educationCategory?.value,
+      'education_category': educationCategory?.toString().split('.').last,
       'institution_name': institutionName,
       'academic_year': academicYear,
       'parent_contact': parentContact,
@@ -163,31 +163,37 @@ class User extends Equatable {
   }
 
   factory User.fromMap(Map<String, dynamic> map) {
-    return User(
-      id: map['id'],
-      name: map['name'],
-      email: map['email'],
-      phone: map['phone'],
-      dateOfBirth: map['date_of_birth'] != null ? DateTime.parse(map['date_of_birth']) : null,
-      gender: map['gender'] != null ? GenderExtension.fromString(map['gender']) : null,
-      address: map['address'],
-      city: map['city'],
-      state: map['state'],
-      district: map['district'],
-      country: map['country'],
-      pincode: map['pincode'],
-      identityProofType: map['identity_proof_type'],
-      identityProofNumber: map['identity_proof_number'],
-      identityProofImagePath: map['identity_proof_image_path'],
-      educationCategory: map['education_category'] != null ? EducationCategoryExtension.fromString(map['education_category']) : null,
-      institutionName: map['institution_name'],
-      academicYear: map['academic_year'],
-      parentContact: map['parent_contact'],
-      preferredLanguage: map['preferred_language'] != null ? LanguageExtension.fromString(map['preferred_language']) : null,
-      passwordHash: map['password_hash'],
-      isProfileComplete: map['is_profile_complete'] ?? false,
-      createdAt: map['created_at'] != null ? DateTime.parse(map['created_at']) : null,
-    );
+    try {
+      return User(
+        id: map['id'] ?? 0,
+        name: map['name'] ?? map['full_name'] ?? 'Unknown User',
+        email: map['email'],
+        phone: map['phone'],
+        dateOfBirth: map['date_of_birth'] != null ? DateTime.parse(map['date_of_birth'].toString()) : null,
+        gender: map['gender'] != null ? GenderExtension.fromString(map['gender'].toString()) : null,
+        address: map['address'],
+        city: map['city'],
+        state: map['state'],
+        district: map['district'],
+        country: map['country'],
+        pincode: map['pincode'],
+        identityProofType: map['identity_proof_type'],
+        identityProofNumber: map['identity_proof_number'],
+        identityProofImagePath: map['identity_proof_image_path'],
+        educationCategory: map['education_category'] != null ? EducationCategoryExtension.fromString(map['education_category'].toString()) : null,
+        institutionName: map['institution_name'],
+        academicYear: map['academic_year'],
+        parentContact: map['parent_contact'],
+        preferredLanguage: map['preferred_language'] != null ? LanguageExtension.fromString(map['preferred_language'].toString()) : null,
+        passwordHash: map['password_hash'],
+        isProfileComplete: map['is_profile_complete'] ?? false,
+        createdAt: map['created_at'] != null ? DateTime.parse(map['created_at'].toString()) : null,
+      );
+    } catch (e) {
+      print('❌ Error in User.fromMap: $e');
+      print('   Map data: $map');
+      rethrow;
+    }
   }
 
   @override

@@ -43,6 +43,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  EducationCategory _getEducationCategory(int categoryId) {
+    switch (categoryId) {
+      case 1:
+        return EducationCategory.tenthFail;
+      case 2:
+        return EducationCategory.tenthPass;
+      case 3:
+        return EducationCategory.twelfthFail;
+      case 4:
+        return EducationCategory.twelfthPass;
+      case 5:
+        return EducationCategory.graduateScience;
+      case 6:
+        return EducationCategory.graduateCommerce;
+      case 7:
+        return EducationCategory.graduateArts;
+      case 8:
+        return EducationCategory.engineeringCse;
+      case 9:
+        return EducationCategory.postgraduate;
+      default:
+        return EducationCategory.tenthPass;
+    }
+  }
+
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -58,15 +83,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
 
-      // Register user
-      final authService = AuthService();
-      await authService.register(name, email, password, _selectedCategoryId);
+      // Register user as student (default registration type)
+      final authService = MultiUserAuthService();
+      await authService.registerStudent(
+        fullName: name,
+        email: email,
+        phone: '0000000000', // Default phone for quick registration
+        dateOfBirth: DateTime(2000, 1, 1), // Default date
+        gender: Gender.other,
+        educationCategory: _getEducationCategory(_selectedCategoryId),
+        institutionName: 'Not specified',
+        academicYear: '2023-24',
+        parentContact: '0000000000',
+        address: 'Not specified',
+        state: 'Not specified',
+        district: 'Not specified',
+        city: 'Not specified',
+        pincode: '000000',
+        preferredLanguage: Language.english,
+        identityType: IdentityProofType.aadhaar,
+        identityNumber: '0000-0000-0000',
+        password: password,
+      );
 
       if (!mounted) return;
 
-      // Navigate to profile completion screen on successful registration
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Registration successful! Welcome $name'),
+          backgroundColor: AppColors.success,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      // Navigate to home screen on successful registration
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const ProfileCompletionScreen()),
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
     } catch (e) {
       // Show error message

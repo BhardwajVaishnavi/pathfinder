@@ -20,7 +20,7 @@ class TestDetailsScreen extends StatefulWidget {
 
 class _TestDetailsScreenState extends State<TestDetailsScreen> {
   final TestService _testService = TestService();
-  final AuthService _authService = AuthService();
+  final MultiUserAuthService _authService = MultiUserAuthService();
 
   bool _isLoading = false;
   List<Question> _questions = [];
@@ -34,8 +34,10 @@ class _TestDetailsScreenState extends State<TestDetailsScreen> {
   }
 
   void _checkProfileCompletion() {
-    // Check if user profile is complete
-    if (!_authService.isUserProfileComplete()) {
+    // For test users, profile is already complete, so load data directly
+    if (_authService.isLoggedIn && _authService.currentUser?.isProfileComplete == true) {
+      _loadData();
+    } else {
       // Show a dialog to inform the user
       WidgetsBinding.instance.addPostFrameCallback((_) {
         showDialog(
@@ -63,8 +65,6 @@ class _TestDetailsScreenState extends State<TestDetailsScreen> {
           ),
         );
       });
-    } else {
-      _loadData();
     }
   }
 
@@ -78,12 +78,8 @@ class _TestDetailsScreenState extends State<TestDetailsScreen> {
       // Load questions for the test set using the test service
       _questions = await _testService.getQuestionsForTestSet(widget.testSet.id);
 
-      // Load category for the test set
-      final categories = await _testService.getCategories();
-      _category = categories.firstWhere(
-        (c) => c.id == widget.testSet.categoryId,
-        orElse: () => Category(id: 0, name: 'Unknown'),
-      );
+      // Create category directly without database call
+      _category = _getCategoryById(widget.testSet.categoryId);
     } catch (e) {
       setState(() {
         _errorMessage = 'Failed to load test details: ${e.toString()}';
@@ -95,9 +91,35 @@ class _TestDetailsScreenState extends State<TestDetailsScreen> {
     }
   }
 
+  // Helper method to get category by ID without database
+  Category _getCategoryById(int categoryId) {
+    final categoryMap = {
+      1: Category(id: 1, name: '10th Fail', description: 'Tests for 10th fail students'),
+      2: Category(id: 2, name: '10th Pass', description: 'Tests for 10th pass students'),
+      3: Category(id: 3, name: '12th Fail', description: 'Tests for 12th fail students'),
+      4: Category(id: 4, name: '12th Pass', description: 'Tests for 12th pass students'),
+      5: Category(id: 5, name: 'Graduate (Science)', description: 'Tests for science graduates'),
+      6: Category(id: 6, name: 'Graduate (Commerce)', description: 'Tests for commerce graduates'),
+      7: Category(id: 7, name: 'Graduate (Arts)', description: 'Tests for arts graduates'),
+      8: Category(id: 8, name: 'Graduate (BTech)', description: 'Tests for BTech graduates'),
+      9: Category(id: 9, name: 'Postgraduate', description: 'Tests for postgraduates'),
+    };
+
+    return categoryMap[categoryId] ?? Category(id: 0, name: 'Unknown', description: 'Unknown category');
+  }
+
   void _navigateToInstructions() {
-    // Check if user profile is complete before navigating
-    if (!_authService.isUserProfileComplete()) {
+    // For test users, profile is already complete, so navigate directly
+    if (_authService.isLoggedIn && _authService.currentUser?.isProfileComplete == true) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => TestInstructionsScreen(
+            testSet: widget.testSet,
+            questions: _questions,
+          ),
+        ),
+      );
+    } else {
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -120,15 +142,6 @@ class _TestDetailsScreenState extends State<TestDetailsScreen> {
               child: const Text('Complete Profile'),
             ),
           ],
-        ),
-      );
-    } else {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => TestInstructionsScreen(
-            testSet: widget.testSet,
-            questions: _questions,
-          ),
         ),
       );
     }

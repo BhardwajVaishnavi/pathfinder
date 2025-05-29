@@ -10,6 +10,7 @@
     "test-connection": "node test_connection.js"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "pg": "^8.11.3"
   },
   "devDependencies": {

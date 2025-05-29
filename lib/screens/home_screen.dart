@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../utils/utils.dart';
 import '../widgets/widgets.dart';
 import 'chat/chat_screen.dart';
-import 'dashboard_screen.dart';
+import 'simple_dashboard_screen.dart';
 import 'profile_screen.dart';
 import 'test/test_list_screen.dart';
 import 'results/results_screen.dart';
@@ -18,7 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    const DashboardScreen(),
+    const SimpleDashboardScreen(),
     const TestListScreen(),
     const ResultsScreen(),
     const ChatScreen(),

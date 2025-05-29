@@ -15,7 +15,7 @@ class TestListScreen extends StatefulWidget {
 
 class _TestListScreenState extends State<TestListScreen> {
   final TestService _testService = TestService();
-  final AuthService _authService = AuthService();
+  final MultiUserAuthService _authService = MultiUserAuthService();
 
   bool _isLoading = false;
   List<Category> _categories = [];
@@ -28,8 +28,10 @@ class _TestListScreenState extends State<TestListScreen> {
   }
 
   void _checkProfileCompletion() {
-    // Check if user profile is complete
-    if (!_authService.isUserProfileComplete()) {
+    // For test users, profile is already complete, so load categories directly
+    if (_authService.isLoggedIn && _authService.currentUser?.isProfileComplete == true) {
+      _loadCategories();
+    } else {
       // Show a dialog to inform the user
       WidgetsBinding.instance.addPostFrameCallback((_) {
         showDialog(
@@ -57,8 +59,6 @@ class _TestListScreenState extends State<TestListScreen> {
           ),
         );
       });
-    } else {
-      _loadCategories();
     }
   }
 
@@ -69,8 +69,8 @@ class _TestListScreenState extends State<TestListScreen> {
     });
 
     try {
-      // Load categories using the test service
-      _categories = await _testService.getCategories();
+      // Load categories filtered by student's education level
+      _categories = await _testService.getCategoriesForStudent();
     } catch (e) {
       setState(() {
         _errorMessage = 'Failed to load categories: ${e.toString()}';
@@ -83,8 +83,14 @@ class _TestListScreenState extends State<TestListScreen> {
   }
 
   void _navigateToTestSetList(Category category) {
-    // Check if user profile is complete before navigating
-    if (!_authService.isUserProfileComplete()) {
+    // For test users, profile is already complete, so navigate directly
+    if (_authService.isLoggedIn && _authService.currentUser?.isProfileComplete == true) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => TestSetListScreen(category: category),
+        ),
+      );
+    } else {
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -107,12 +113,6 @@ class _TestListScreenState extends State<TestListScreen> {
               child: const Text('Complete Profile'),
             ),
           ],
-        ),
-      );
-    } else {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => TestSetListScreen(category: category),
         ),
       );
     }

@@ -9,3 +9,5 @@ export 'notification_service.dart';
 export 'analytics_service.dart';
 export 'sharing_service.dart';
 export 'chat_service.dart';
+export 'test_completion_service.dart';
+export 'pdf_report_service.dart';
